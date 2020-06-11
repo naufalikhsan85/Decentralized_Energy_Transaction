@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+    <title>Market</title>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" >Dapp Energy</a>
+
+        <button class="navbar-toggler navbar-toogler-right " type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html">Home</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="market.html">Market <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="fund.html">Fund </a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Account
+
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="user.html">User Data</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="meter.html">Meter Data</a>
+                    </div>
+                </li>
+            </ul>
+            <a href="connect.html" class="btn btn-light btn-sm">Ethereum Account</a>
+        </div>
+    </div>
+</nav>
+
+<br>
+<div class="container">
+    <button  onclick="_checkMarket()" class="btn btn-primary float-right btn-sm">Check Market</button>
+    <h4>Energy Market Information</h4>
+    <p>Current Login Address : <b id="_addressMarket"></b> </p>
+    <div class="container">
+        <h5>Current Price</h5>
+        <table class="table">
+
+            <thead>
+            <tr>
+                <th scope="col">Energy Price (IDR/kWh)</th>
+                <th scope="col">Declaration Date</th>
+                <th scope="col">Start Date</th>
+                <th scope="col">Expire Date</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td id="_currentPrice"></td>
+                <td id="_declareDate"></td>
+                <td id="_startDate"></td>
+                <td id="_expireDate"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <br>
+    <div class="container">
+        <h5>Current Consumer Request</h5>
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">Remaining Consumer Request (kWh)</th>
+                <th scope="col">Taken Consumer Request (kWh)</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td id="_totalReq"></td>
+                <td id="_totalTaken"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <br>
+
+    <div class="container">
+        <h5>Previous Total Consumption and Production</h5>
+        <table class="table">
+
+            <thead>
+            <tr>
+                <th scope="col">Total Consumption (kWh)</th>
+                <th scope="col">Total Production (kWh)</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td id="_totalCon"></td>
+                <td id="_totalProd"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <br>
+    <div class="container">
+        <h5>Market Consumption and Production Capacity</h5>
+        <table class="table">
+
+            <thead>
+            <tr>
+                <th scope="col">Market Consumption Capacity (kWh)</th>
+                <th scope="col">Market Production Capacity (kWh)</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td id="_maxCon"></td>
+                <td id="_maxProd"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<br>
+
+<div class="container">
+    <h4>Buy/Sell Energy</h4>
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="form-group row-cols-2">
+                        <label for="_reqEnergy">Buy Energy</label>
+                        <input type="number" min="0" class="form-control form-control-sm" id="_reqEnergy" placeholder="Amount of Energy (kWh)">
+                    </div>
+                    <button onclick="_requestToConsume()" class="btn btn-primary">Buy</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="form-group row-cols-2">
+                        <label for="_takeEnergy">Sell Energy</label>
+                        <input type="number"  min="0" class="form-control form-control-sm" id="_takeEnergy" placeholder="Amount of Energy (kWh)">
+                    </div>
+                    <button onclick="_takeToProduce()" class="btn btn-primary">Sell</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br>
+
+<div class="container">
+    <h6>Status Transaction</h6>
+    <p>Tx : <b id="_tx"></b></p>
+    <p>Status : <b id="_mined"></b></p>
+    <p>Result : <b id="_result"></b></p>
+</div>
+
+
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7/web3.min.js" integrity="sha256-9rSwSMn4GDjf9FcHmJSvdiKGrk+mNIUmM4ltFDu3MUU=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/gh/ethereumjs/browser-builds/dist/ethereumjs-tx/ethereumjs-tx-1.3.3.min.js"></script>
+
+<script src="market.js"></script>
+
+
+
+</body>
+</html>

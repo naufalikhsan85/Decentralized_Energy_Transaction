@@ -1,0 +1,13 @@
+{
+  "name": "EnergyTransaction",
+  "version": "1.0.0",
+  "dependencies": {
+    "ethereumjs-tx": "^2.1.2",
+    "node-fetch": "^2.6.0",
+    "readline-sync": "^1.4.10"
+  },
+  "devDependencies": {
+    "mqtt": "^4.1.0",
+    "web3": "^1.2.9"
+  }
+}
