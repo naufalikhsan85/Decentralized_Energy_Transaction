@@ -21,8 +21,11 @@ async function decryptMsg(msg) {
 
 let filename= readline.question("What is your keystore filename? ");
 
-let topic1='HW_OUT_'+((filename.substring(9)).slice(0,-20))
-let topic2='meterOutData'+((filename.substring(9)).slice(0,-20))
+let cutname1=filename.substring(9)
+let cutname2=cutname1.substring(0, 42)
+
+let topic1='HW_OUT_'+cutname2
+let topic2='meterOutData'+cutname2
 //Energy Network state
 var state = 'closed'
 //kWh Meter

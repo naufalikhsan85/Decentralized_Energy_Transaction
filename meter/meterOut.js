@@ -283,9 +283,11 @@ async function inputMeter() {
 let circuitState = ''
 let connected = false
 
-let topic1 = 'HW_OUT_' + ((filename.substring(9)).slice(0,-20))
-let topic2 = 'meterOutData' + ((filename.substring(9)).slice(0,-20))
-let topic3=  'meterExportGUI' + ((filename.substring(9)).slice(0,-20))
+let cutname1=filename.substring(9)
+let cutname2=cutname1.substring(0, 42)
+let topic1 = 'HW_OUT_' + cutname2
+let topic2 = 'meterOutData' + cutname2
+let topic3=  'meterExportGUI' + cutname2
 console.log(topic3)
 client.on('connect', () => {
         //publisher
