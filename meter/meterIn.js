@@ -36,7 +36,7 @@ var secretKey= '12345'
 let url= 'https://energydapp.000webhostapp.com/abi.json'
 //'http://192.168.100.6:8080/abi.json'
 //'https://energydapp.000webhostapp.com/abi.json'
-//'https://raw.githubusercontent.com/naufalikhsan85/ABI_JSON/master/abi.json'
+//'https://raw.githubusercontent.com/naufalikhsan85/Decentralized_Energy_Transaction/master/contract/abi.json'
 
 
 let dataABI
