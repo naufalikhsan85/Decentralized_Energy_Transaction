@@ -9,28 +9,8 @@ const serverUrl   = "mqtt://test.mosquitto.org";
 
 const client = mqtt.connect(serverUrl);
 
-
 let filename=readline.question("What is your keystore filename? ");
 let decpassword=readline.question("What is your keystore password? ");
-
-/*
-var CryptoJS = require("crypto-js");
-var secretKey= '12345'
-// Encrypt
- function enryptMsg(msg) {
-    var chipertext=  CryptoJS.AES.encrypt(msg, secretKey).toString();
-    console.log(chipertext)
-    return chipertext
-}
-// Decrypt
- function decryptMsg(msg) {
-    var bytes  =  CryptoJS.AES.decrypt(msg, secretKey);
-    var originalText = bytes.toString(CryptoJS.enc.Utf8);
-    console.log(originalText)
-    return originalText
-}
- */
-
 
 //Blockchain Part
 let url='https://energydapp.000webhostapp.com/abi.json'
@@ -40,6 +20,9 @@ let url='https://energydapp.000webhostapp.com/abi.json'
 
 
 let dataABI
+let contract_Address;
+let abi;
+let contract;
 
 async function fetchData(){
     let response = await fetch(url);
@@ -59,24 +42,17 @@ async function getABI() {
     return  dataABI.abi;
 }
 
-/*
- function fetchDataTest(){
-    let response =  fetch(url);
-    let data =  response.json();
-    data = JSON.stringify(data);
-    return JSON.parse(data);
+async function getDataABI(){
+    dataABI = await fetchData();
+    contract_Address=dataABI.address;
+    abi=dataABI.abi;
 
 }
+async function instanceContract() {
+    contract = new web3.eth.Contract(abi, contract_Address);
+}
 
-var abc = fetchDataTest()
-console.log(abc)
 
-
- */
-
-let contract_Address;
-let abi;
-let contract
 let objKeyStore;
 let path = "./" + filename
 objKeyStore = require(path);
@@ -132,7 +108,7 @@ function convert(inputTs) {
 
     }
 async function sendSign(myData, myGas) {
-        contract_Address = await getAddress()
+        //contract_Address = await getAddress()
 
         web3.eth.getTransactionCount(current_account, (err, txCount) => {
 
@@ -169,26 +145,20 @@ async function sendSign(myData, myGas) {
     }
 
 async function _meterRecordOut() {
-        abi = await getABI()
-        contract_Address = await getAddress()
-        contract = new web3.eth.Contract(abi, contract_Address);
+
         let myDataOut = contract.methods.meterRecordOut(meterData).encodeABI();
         await sendSign(myDataOut, 100000);
     }
 
 async function getHistoryMeterData() {
-        abi = await getABI()
-        contract_Address = await getAddress()
-        contract = new web3.eth.Contract(abi, contract_Address);
+
         let meterHistory = await contract.methods.getMeterRecordInOut(current_account).call()
         meterData= meterHistory[1]
         return meterData
     }
 
 async function getMeterData(){
-    abi = await getABI()
-    contract_Address = await getAddress()
-    contract = new web3.eth.Contract(abi, contract_Address);
+
 
     myMeterThOut = await contract.methods.meterOutTh(current_account).call()
     meterRecordInOut = await contract.methods.getMeterRecordInOut(current_account).call()
@@ -235,38 +205,6 @@ async function networkExport() {
             closeCircuit()
             console.log('E')
         }
-        /*
-        if(ts > start){
-            if(ts < expire){
-                if(currentMeterOut < limitOut){
-                    statusOut="Onn";
-                    openCircuit()
-                }
-                else if(currentMeterOut === limitOut){
-                    statusOut="Off";
-                    closeCircuit()
-                    //openCircuit()
-                }
-                else{
-                    statusOut="Off";
-                    closeCircuit()
-                    //openCircuit()
-
-                }
-            }
-            else{
-                statusOut="Off";
-                closeCircuit()
-                //openCircuit()
-            }
-        }
-        else{
-            statusOut="Off";
-            closeCircuit()
-            //openCircuit()
-        }
-
-         */
 
         console.log('stat:', statusOut)
         console.log('meter data:', Number(meterData))
@@ -283,11 +221,10 @@ async function inputMeter() {
 let circuitState = ''
 let connected = false
 
-let cutname1=filename.substring(9)
-let cutname2=cutname1.substring(0, 42)
-let topic1 = 'HW_OUT_' + cutname2
-let topic2 = 'meterOutData' + cutname2
-let topic3=  'meterExportGUI' + cutname2
+
+let topic1 = 'HW_OUT_' + current_account
+let topic2 = 'meterOutData' + current_account
+let topic3=  'meterExportGUI' + current_account
 console.log(topic3)
 client.on('connect', () => {
         //publisher
@@ -317,6 +254,7 @@ client.on('message', (topic, message) => {
 function sendMeterExport() {
     console.log('sending meter Export to GUI :',meterData.toString())
     client.publish(topic3 +'/toGUI',meterData.toString())
+    console.log(topic3 +'/toGUI')
 }
 
 function handleCircuitConnected(message) {
@@ -371,7 +309,7 @@ function closeCircuit() {
 function runAll(){
     setInterval(getMeterData,15000)
     setInterval(networkExport, 500);
-    setInterval(inputMeter,300000)
+    setInterval(inputMeter,240000)
 }
 
 
@@ -381,9 +319,13 @@ function main(){
     setTimeout(runAll,10000)
 
 }
+function getDataALL() {
+    getDataABI()
+    setTimeout( instanceContract,5000)
+    setTimeout( main,5000)
+}
 
-
-main()
+getDataALL()
 
 
 

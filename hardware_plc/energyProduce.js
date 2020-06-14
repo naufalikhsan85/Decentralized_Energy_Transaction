@@ -1,31 +1,29 @@
+const Web3 = require('web3');
+web3 = new Web3(new Web3.providers.HttpProvider('https://ropsten.infura.io/v3/07d2bc437e6043ebb25b51afb4760fda'));
 const mqtt = require('mqtt')
 const client = mqtt.connect('mqtt://test.mosquitto.org')
 const readline = require('readline-sync')
-/*
-var CryptoJS = require("crypto-js");
-var secretKey= '12345'
-// Encrypt
-async function enryptMsg(msg) {
-    var chipertext= await CryptoJS.AES.encrypt(msg, secretKey).toString();
-    console.log(chipertext)
-    return chipertext
-}
-// Decrypt
-async function decryptMsg(msg) {
-    var bytes  = await CryptoJS.AES.decrypt(msg, secretKey);
-    var originalText = bytes.toString(CryptoJS.enc.Utf8);
-    console.log(originalText)
-    return originalText
-}
- */
 
 let filename= readline.question("What is your keystore filename? ");
+let decpassword=readline.question("What is your keystore password? ");
 
-let cutname1=filename.substring(9)
-let cutname2=cutname1.substring(0, 42)
+let objKeyStore;
+let path = "./" + filename
+objKeyStore = require(path);
+//console.log(objKeyStore)
 
-let topic1='HW_OUT_'+cutname2
-let topic2='meterOutData'+cutname2
+let decryptData = web3.eth.accounts.decrypt(objKeyStore, decpassword);
+console.log(decryptData.privateKey)
+
+let input_privateKey = decryptData.privateKey.substring(2)
+let hexKey = "0x" + input_privateKey;
+let acc = web3.eth.accounts.privateKeyToAccount(hexKey);
+let current_account = acc.address;
+web3.eth.defaultAccount = current_account;
+
+
+let topic1='HW_OUT_'+ current_account
+let topic2='meterOutData'+ current_account
 //Energy Network state
 var state = 'closed'
 //kWh Meter

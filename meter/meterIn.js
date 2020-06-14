@@ -13,25 +13,6 @@ let filename=readline.question("What is your keystore filename? ");
 let decpassword=readline.question("What is your keystore password? ");
 
 
-/*
-var CryptoJS = require("crypto-js");
-var secretKey= '12345'
-// Encrypt
- function enryptMsg(msg) {
-    var chipertext=  CryptoJS.AES.encrypt(msg, secretKey).toString();
-    console.log(chipertext)
-    return chipertext
-}
-// Decrypt
- function decryptMsg(msg) {
-    var bytes  =  CryptoJS.AES.decrypt(msg, secretKey);
-    var originalText = bytes.toString(CryptoJS.enc.Utf8);
-    console.log(originalText)
-    return originalText
-}
- */
-
-
 //Blockchain Part
 let url= 'https://energydapp.000webhostapp.com/abi.json'
 //'http://192.168.100.6:8080/abi.json'
@@ -40,6 +21,9 @@ let url= 'https://energydapp.000webhostapp.com/abi.json'
 
 
 let dataABI
+let contract_Address;
+let abi;
+let contract
 
 async function fetchData(){
     let response = await fetch(url);
@@ -49,34 +33,19 @@ async function fetchData(){
     data = JSON.parse(data);
     return data;
 }
-async function getAddress() {
+
+async function getDataABI(){
     dataABI = await fetchData();
-    return dataABI.address;
+    contract_Address=dataABI.address;
+    abi=dataABI.abi;
 
 }
-async function getABI() {
-    dataABI = await fetchData();
-    return  dataABI.abi;
+async function instanceContract() {
+    contract = new web3.eth.Contract(abi, contract_Address);
 }
 
-/*
- function fetchDataTest(){
-    let response =  fetch(url);
-    let data =  response.json();
-    data = JSON.stringify(data);
-    return JSON.parse(data);
-
-}
-
-var abc = fetchDataTest()
-console.log(abc)
 
 
- */
-
-let contract_Address;
-let abi;
-let contract
 let objKeyStore;
 let path = "./" + filename
 objKeyStore = require(path);
@@ -132,8 +101,6 @@ function convert(inputTs) {
 
 }
 async function sendSign(myData, myGas) {
-    contract_Address = await getAddress()
-
     web3.eth.getTransactionCount(current_account, (err, txCount) => {
 
 
@@ -169,26 +136,20 @@ async function sendSign(myData, myGas) {
 }
 
 async function _meterRecordIn() {
-    abi = await getABI()
-    contract_Address = await getAddress()
-    contract = new web3.eth.Contract(abi, contract_Address);
+
     let myDataIn = contract.methods.meterRecordIn(meterData).encodeABI();
     sendSign(myDataIn, 100000);
 }
 
 async function getHistoryMeterData() {
-    abi = await getABI()
-    contract_Address = await getAddress()
-    contract = new web3.eth.Contract(abi, contract_Address);
+
     let meterHistory = await contract.methods.getMeterRecordInOut(current_account).call()
     meterData= meterHistory[0]
     return meterData
 }
 
 async function getMeterData(){
-    abi = await getABI()
-    contract_Address = await getAddress()
-    contract = new web3.eth.Contract(abi, contract_Address);
+
 
     myMeterThIn = await contract.methods.meterInTh(current_account).call()
     meterRecordInOut = await contract.methods.getMeterRecordInOut(current_account).call()
@@ -252,11 +213,9 @@ async function inputMeter() {
 let circuitState = ''
 let connected = false
 
-let cutname1=filename.substring(9)
-let cutname2=cutname1.substring(0, 42)
-let topic1 = 'HW_IN_' + cutname2
-let topic2 = 'meterInData' + cutname2
-let topic3=  'meterImportGUI' + cutname2
+let topic1 = 'HW_IN_' + current_account
+let topic2 = 'meterInData' + current_account
+let topic3=  'meterImportGUI' + current_account
 
 
 client.on('connect', () => {
@@ -339,7 +298,7 @@ function closeCircuit() {
 function runAll(){
     setInterval(getMeterData,15000)
     setInterval(networkImport, 500);
-    setInterval(inputMeter,300000)
+    setInterval(inputMeter,240000)
 }
 
 
@@ -349,10 +308,14 @@ function main(){
     setTimeout(runAll,10000)
 
 }
-main()
 
+function getDataALL() {
+    getDataABI()
+    setTimeout( instanceContract,5000)
+    setTimeout( main,5000)
+}
 
-
+getDataALL()
 
 
 
