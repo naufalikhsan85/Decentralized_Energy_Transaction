@@ -147,7 +147,8 @@ function _setPricePeriod() {
     myData = contract.methods.setPricePeriod
     (
         document.getElementById("_setPrice").value,
-        document.getElementById("_day").value,
+        document.getElementById("_dayDeclare").value,
+        document.getElementById("_dayValid").value,
         pinUser
     ).encodeABI();
     sendSign(myData,xlTx);

@@ -78,7 +78,8 @@ async function sendSign(myData, myGas) {
     })
 }
 
-let meterData=4220
+let meterData=2250
+
 
 
 async function _meterRecordIn() {

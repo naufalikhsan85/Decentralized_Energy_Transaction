@@ -1,5 +1,5 @@
 {
-  "address": "0xC9C9f8FbA5103545DD82F8a7b76CC271796110E8",
+  "address": "0x54024fE6b10054f1283D14a09a0687CC20A1dA3a",
   "abi": [
     {
       "inputs": [],
@@ -1043,6 +1043,11 @@
         {
           "internalType": "uint256",
           "name": "_SetPrice",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_DayDeclare",
           "type": "uint256"
         },
         {
