@@ -157,9 +157,9 @@ contract EnergyDapp is VPPToken, Digital_IDR{
         _;
     }
 
-    event LogUserRegDel(string _KindOfFunction,address _UserAddress, uint index);
-    event LogupdateMyUserData(string _KindOfFunction, address _UserAddress, string  _UserName);
-    event LogUpdateMyCapacity(string _KindOfFunction,uint256 _ProductionCapacity,uint256 _ConsumptionCapacity);
+    event LogUserRegDel(string _KindOfFunction,address _UserAddress, uint index, uint256 _TimeStamp);
+    event LogupdateMyUserData(string _KindOfFunction, address _UserAddress, string  _UserName, uint256 _TimeStamp);
+    event LogUpdateMyCapacity(string _KindOfFunction,uint256 _ProductionCapacity,uint256 _ConsumptionCapacity, uint256 _TimeStamp);
     event LogChangePIN(address _UserAddress,uint256 _TimeStamp);
 
     event LogDepositIDR(address _UserAddress, uint256 _AmountIDR,uint256 _TimeStamp);
@@ -172,6 +172,11 @@ contract EnergyDapp is VPPToken, Digital_IDR{
 
     event LogPayBill(address _UserAddress,uint256 _Bill,uint256 _TimeStamp);
     event LogPayRevenue(address _UserAddress,uint256 _Revenue,uint256 _TimeStamp);
+
+    event LogMeterInRecord(address _UserAddress, uint256 _MeterIn, uint256 _TimeStamp);
+    event LogMeterOutRecord(address _UserAddress, uint256 _MeterOut, uint256 _TimeStamp);
+
+    event LogChangeOwner(address _OwnerBefore, address _OwnerAfter, uint256 _TimeStamp);
 
     constructor() public{
 
@@ -188,7 +193,7 @@ contract EnergyDapp is VPPToken, Digital_IDR{
         users[counterUsers] = owner; //simpan alamat dengan index
         userdbs[owner].index =counterUsers;//simpan index dengan alamat
 
-        emit LogUserRegDel("Create Owner",owner,userdbs[owner].index);
+        emit LogUserRegDel("Create Owner",owner,userdbs[owner].index, now);
     }
 
 //************************************User function**************************************
@@ -208,7 +213,7 @@ contract EnergyDapp is VPPToken, Digital_IDR{
 
         userPIN[_NewUserAddress]=keccak256(abi.encodePacked(_defaultPIN));//Set PIN
 
-        emit LogUserRegDel("Create User",_NewUserAddress,userdbs[_NewUserAddress].index);
+        emit LogUserRegDel("Create User",_NewUserAddress,userdbs[_NewUserAddress].index, now);
     }
 
 //	Menghapus User yang ingin melepaskan diri dari jaringan VPP
@@ -218,7 +223,7 @@ contract EnergyDapp is VPPToken, Digital_IDR{
     userExist(_TargetUserAddress){
 
         isUser[_TargetUserAddress] = false;
-        emit LogUserRegDel("Delete User",_TargetUserAddress,userdbs[_TargetUserAddress].index);
+        emit LogUserRegDel("Delete User",_TargetUserAddress,userdbs[_TargetUserAddress].index, now);
     }
 
 //  Melakukan update data user
@@ -231,7 +236,7 @@ contract EnergyDapp is VPPToken, Digital_IDR{
         userdbs[msg.sender].userLocation     =_NewLocation;
         userdbs[msg.sender].userEmail        =_NewUserEmail;
 
-        emit LogupdateMyUserData("Update User Data",msg.sender,_NewUserName);
+        emit LogupdateMyUserData("Update User Data",msg.sender,_NewUserName, now);
     }
 
 //  Melihat data user
@@ -261,7 +266,7 @@ contract EnergyDapp is VPPToken, Digital_IDR{
         maxConsumptionCapacity=(maxConsumptionCapacity.sub(tempNumber)).add(_ConsumptionCapacity);
         userdbs[msg.sender].consumptionCapacity=_ConsumptionCapacity;
 
-        emit LogUpdateMyCapacity("updateMyCapacity",_ProductionCapacity,_ConsumptionCapacity);
+        emit LogUpdateMyCapacity("updateMyCapacity",_ProductionCapacity,_ConsumptionCapacity, now);
     }
 
     function getMyCapacity(address _UserAddress) public view
@@ -322,16 +327,18 @@ contract EnergyDapp is VPPToken, Digital_IDR{
 
 //************************Recording function*******************************************
 
-    function meterRecordIn(uint256 _InMeterNow) public  {
+    function meterRecordIn(uint256 _InMeterNow) public userExist(msg.sender) {
         //hanya diizinkan ketika belum expire dan dibawah batas
         require(_InMeterNow <= mdbs[msg.sender].limitMeterIn,"Meter over the energy limit");
         require(now <=dealdbs[msg.sender].dealExpireIn,"Meter Expired");
         require(now >=dealdbs[msg.sender].dealStartIn,"Meter not Started");
 
         mdbs[msg.sender].currentMeterIn=_InMeterNow; //meter konsumsi
+
+        emit LogMeterInRecord(msg.sender, _InMeterNow, now);
     }
 
-    function meterRecordOut(uint256 _OutMeterNow) public {
+    function meterRecordOut(uint256 _OutMeterNow) public userExist(msg.sender) {
         //hanya diizinkan ketika belum expire dan dibawah batas
         require(_OutMeterNow <= mdbs[msg.sender].limitMeterOut,"Meter over the energy limit");
         require(now <=dealdbs[msg.sender].dealExpireOut,"Meter Expired");
@@ -349,9 +356,11 @@ contract EnergyDapp is VPPToken, Digital_IDR{
             mdbs[msg.sender].currentMeterOut=_OutMeterNow;
         }
 
+        emit LogMeterOutRecord(msg.sender, _OutMeterNow, now);
+
     }
 
-    function getMeterRecordInOut(address _UserAddress) public view returns(uint256,uint256){
+    function getMeterRecordInOut(address _UserAddress) public userExist(_UserAddress) view returns(uint256,uint256){
         return(
             mdbs[_UserAddress].currentMeterIn,
             mdbs[_UserAddress].currentMeterOut
@@ -359,7 +368,7 @@ contract EnergyDapp is VPPToken, Digital_IDR{
     }
 
 
-    function getDataConsumeDeal(address _UserAddress) public view returns(uint256,uint256,uint256,uint256){
+    function getDataConsumeDeal(address _UserAddress) public userExist(_UserAddress) view returns(uint256,uint256,uint256,uint256){
         return(
             dealdbs[_UserAddress].dealPriceIn,
             dealdbs[_UserAddress].dealPriceInPrev,
@@ -369,7 +378,7 @@ contract EnergyDapp is VPPToken, Digital_IDR{
     }
 
 
-    function getDataProduceDeal(address _UserAddress) public view returns(uint256,uint256,uint256,uint256){
+    function getDataProduceDeal(address _UserAddress) public userExist(_UserAddress) view returns(uint256,uint256,uint256,uint256){
         return(
             dealdbs[_UserAddress].dealPriceOut,
             dealdbs[_UserAddress].dealPriceOutPrev,
@@ -378,7 +387,7 @@ contract EnergyDapp is VPPToken, Digital_IDR{
             );
     }
 
-    function meterInTh(address _UserAddress) public view returns(uint256,uint256,uint256,uint256,uint256,uint256){
+    function meterInTh(address _UserAddress) public userExist(_UserAddress) view returns(uint256,uint256,uint256,uint256,uint256,uint256){
         return (
             dealdbs[_UserAddress].dealStartIn,
             dealdbs[_UserAddress].dealStartInPrev,
@@ -389,7 +398,7 @@ contract EnergyDapp is VPPToken, Digital_IDR{
             );
     }
 
-    function meterOutTh(address _UserAddress) public view returns(uint256,uint256,uint256,uint256,uint256,uint256){
+    function meterOutTh(address _UserAddress) public userExist(_UserAddress) view returns(uint256,uint256,uint256,uint256,uint256,uint256){
         return (
             dealdbs[_UserAddress].dealStartOut,
             dealdbs[_UserAddress].dealStartOutPrev,
@@ -402,7 +411,7 @@ contract EnergyDapp is VPPToken, Digital_IDR{
 
 //******************************Set Price function**********************************
 
-    function setPricePeriod(uint256 _SetPrice, uint256 _DayDeclare, uint256 _DayValid, bytes32 _PIN) public pinCheck(_PIN) contractExpired
+    function setPricePeriod(uint256 _SetPrice, uint256 _DayDeclare, uint256 _DayValid, bytes32 _PIN) public onlyOwner pinCheck(_PIN) contractExpired
     {
 
     savePrevPricePeriode();
@@ -447,7 +456,7 @@ contract EnergyDapp is VPPToken, Digital_IDR{
 
 //******************************Request function************************************
 
-    function requestToConsume(uint256 _AmountEnergyReq, bytes32 _PIN) public pinCheck(_PIN) inDeclarationTime contractNotStarted
+    function requestToConsume(uint256 _AmountEnergyReq, bytes32 _PIN) public pinCheck(_PIN) inDeclarationTime contractNotStarted userExist(msg.sender)
     {
         //Permintaan Energy
         //Permintaan wajib dibawah kapasitas produsen
@@ -491,7 +500,7 @@ contract EnergyDapp is VPPToken, Digital_IDR{
 
 //******************************Take function***************************************
 
-    function takeToProduce(uint256 _AmountEnergyTake, bytes32 _PIN) public pinCheck(_PIN) inDeclarationTime contractNotStarted
+    function takeToProduce(uint256 _AmountEnergyTake, bytes32 _PIN) public pinCheck(_PIN) inDeclarationTime contractNotStarted userExist(msg.sender)
     {
         //Produksi Energy
         //Produksi wajib dibawah kemampuan konsumen
@@ -711,8 +720,11 @@ contract EnergyDapp is VPPToken, Digital_IDR{
     }
 
     function changeOwner(address _NewOwner,bytes32 _PIN) public onlyOwner{
+        
         createUser(_NewOwner,_PIN);
         owner=_NewOwner;
+
+        emit LogChangeOwner(msg.sender, _NewOwner, now);
 
     }
 
