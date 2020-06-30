@@ -14,7 +14,7 @@ let decpassword=readline.question("What is your keystore password? ");
 
 
 //Blockchain Part
-let url= 'https://energydapp.000webhostapp.com/abi.json'
+let url= 'https://raw.githubusercontent.com/naufalikhsan85/Decentralized_Energy_Transaction/master/contract/abi.json'
 //'http://192.168.100.6:8080/abi.json'
 //'https://energydapp.000webhostapp.com/abi.json'
 //'https://raw.githubusercontent.com/naufalikhsan85/Decentralized_Energy_Transaction/master/contract/abi.json'
