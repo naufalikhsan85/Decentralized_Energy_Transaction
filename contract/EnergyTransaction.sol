@@ -720,7 +720,7 @@ contract EnergyDapp is VPPToken, Digital_IDR{
     }
 
     function changeOwner(address _NewOwner,bytes32 _PIN) public onlyOwner{
-        
+
         createUser(_NewOwner,_PIN);
         owner=_NewOwner;
 
