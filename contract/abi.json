@@ -1,5 +1,5 @@
 {
-  "address": "0x3c2daa4A82cA06e04B87d45Df1aAEf6A5B48D3D8",
+  "address": "0x4bCbf830Bb20ac1f5a3b40961F3E372ceD087fe1",
   "abi": [
     {
       "inputs": [],
@@ -54,6 +54,31 @@
         }
       ],
       "name": "ApprovalIDR",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "_OwnerBefore",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "_OwnerAfter",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "_TimeStamp",
+          "type": "uint256"
+        }
+      ],
+      "name": "LogChangeOwner",
       "type": "event"
     },
     {
@@ -210,6 +235,56 @@
         {
           "indexed": false,
           "internalType": "uint256",
+          "name": "_MeterIn",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "_TimeStamp",
+          "type": "uint256"
+        }
+      ],
+      "name": "LogMeterInRecord",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "_UserAddress",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "_MeterOut",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "_TimeStamp",
+          "type": "uint256"
+        }
+      ],
+      "name": "LogMeterOutRecord",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "_UserAddress",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
           "name": "_Bill",
           "type": "uint256"
         },
@@ -311,6 +386,12 @@
           "internalType": "uint256",
           "name": "_ConsumptionCapacity",
           "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "_TimeStamp",
+          "type": "uint256"
         }
       ],
       "name": "LogUpdateMyCapacity",
@@ -335,6 +416,12 @@
           "indexed": false,
           "internalType": "uint256",
           "name": "index",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "_TimeStamp",
           "type": "uint256"
         }
       ],
@@ -386,6 +473,12 @@
           "internalType": "string",
           "name": "_UserName",
           "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "_TimeStamp",
+          "type": "uint256"
         }
       ],
       "name": "LogupdateMyUserData",
